@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b3b8c">
+  <title>Admin STRUK-SPBU</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin-style.css">
+</head>
+<body>
+  <main id="app" class="app-shell">
+    <section id="login-view" class="auth-view" aria-labelledby="login-title">
+      <div class="auth-panel">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 21V4.5A1.5 1.5 0 0 1 6.5 3h8A1.5 1.5 0 0 1 16 4.5V21M3 21h15M8 7h5v4H8zM16 8h2l2 2v7a2 2 0 0 0 2 2" />
+            <path d="M12 11v5M9.5 13.5h5" />
+          </svg>
+        </div>
+        <p class="eyebrow">SISTEM KONTROL AKSES</p>
+        <h1 id="login-title">Admin STRUK-SPBU</h1>
+        <p class="auth-description">Masuk menggunakan akun Firebase Authentication pemilik untuk mengelola akses perangkat.</p>
+
+        <form id="login-form" novalidate>
+          <label class="field" for="admin-email">
+            <span>Email admin</span>
+            <input id="admin-email" name="email" type="email" autocomplete="username" inputmode="email" placeholder="admin@strukspbu.com" required>
+          </label>
+          <label class="field" for="admin-password">
+            <span>Password</span>
+            <input id="admin-password" name="password" type="password" autocomplete="current-password" placeholder="Masukkan password" required>
+          </label>
+          <p id="login-message" class="message" role="alert" aria-live="assertive"></p>
+          <button id="login-button" class="button button-primary button-full" type="submit">Masuk ke Dashboard</button>
+        </form>
+        <p class="auth-footnote">Akses hanya untuk pemilik yang terotorisasi.</p>
+      </div>
+    </section>
+
+    <section id="dashboard-view" class="dashboard-view" hidden aria-labelledby="dashboard-title">
+      <header class="topbar">
+        <div class="topbar-inner">
+          <a class="brand" href="#dashboard" aria-label="Dashboard Admin STRUK-SPBU">
+            <span class="brand-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 21V4.5A1.5 1.5 0 0 1 6.5 3h8A1.5 1.5 0 0 1 16 4.5V21M3 21h15M8 7h5v4H8zM16 8h2l2 2v7a2 2 0 0 0 2 2" />
+                <path d="M12 11v5M9.5 13.5h5" />
+              </svg>
+            </span>
+            <span><strong>STRUK-SPBU</strong><small>Control Center</small></span>
+          </a>
+          <div class="admin-account">
+            <span id="admin-email-label" class="admin-email"></span>
+            <button id="logout-button" class="button button-ghost" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17l5-5-5-5M15 12H3M21 19V5a2 2 0 0 0-2-2h-7" /></svg>
+              Keluar
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <div class="dashboard-content">
+        <section class="hero" aria-labelledby="dashboard-title">
+          <div>
+            <p class="eyebrow">MANAJEMEN AKSES</p>
+            <h1 id="dashboard-title">Dashboard Perangkat</h1>
+            <p>Monitor status dan kelola izin akses semua perangkat operator secara real-time.</p>
+          </div>
+          <div id="connection-indicator" class="connection-status is-loading" role="status" aria-live="polite">
+            <span class="connection-dot" aria-hidden="true"></span>
+            <span id="connection-text">Menghubungkan ke Firestore...</span>
+          </div>
+        </section>
+
+        <section class="summary-grid" aria-label="Ringkasan status perangkat">
+          <article class="summary-card summary-active">
+            <span class="summary-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 12 4.2 4.2L19 6.5" /></svg></span>
+            <div><span class="summary-label">Perangkat Aktif</span><strong id="count-active">0</strong></div>
+          </article>
+          <article class="summary-card summary-disabled">
+            <span class="summary-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14" /></svg></span>
+            <div><span class="summary-label">Nonaktif</span><strong id="count-disabled">0</strong></div>
+          </article>
+          <article class="summary-card summary-blocked">
+            <span class="summary-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="m6.4 6.4 11.2 11.2" /></svg></span>
+            <div><span class="summary-label">Diblokir</span><strong id="count-blocked">0</strong></div>
+          </article>
+          <article class="summary-card summary-removed">
+            <span class="summary-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v5M14 11v5M6 7l1 13h10l1-13M9 7V4h6v3" /></svg></span>
+            <div><span class="summary-label">Dicabut</span><strong id="count-removed">0</strong></div>
+          </article>
+        </section>
+
+        <section class="device-section" aria-labelledby="device-list-title">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">DATA TERBARU</p>
+              <h2 id="device-list-title">Daftar Perangkat</h2>
+            </div>
+            <span id="device-total" class="device-total">0 perangkat</span>
+          </div>
+
+          <div class="filters" aria-label="Filter perangkat">
+            <label class="search-field" for="device-search">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="m16 16 4 4" /></svg>
+              <input id="device-search" type="search" placeholder="Cari ID perangkat atau operator" autocomplete="off">
+            </label>
+            <label class="filter-field" for="status-filter">
+              <span class="sr-only">Filter status perangkat</span>
+              <select id="status-filter">
+                <option value="ALL">Semua status</option>
+                <option value="ACTIVE">Aktif</option>
+                <option value="DISABLED">Nonaktif</option>
+                <option value="BLOCKED">Diblokir</option>
+                <option value="REMOVED">Dicabut</option>
+              </select>
+            </label>
+          </div>
+
+          <p id="dashboard-message" class="dashboard-message" role="alert" aria-live="polite"></p>
+          <div id="device-list" class="device-list" aria-live="polite">
+            <div class="list-state"><span class="spinner" aria-hidden="true"></span><p>Memuat data perangkat...</p></div>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <div id="action-overlay" class="overlay" hidden aria-hidden="true">
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-describedby="modal-description">
+      <div id="modal-icon" class="modal-icon" aria-hidden="true"></div>
+      <p id="modal-kicker" class="eyebrow">KONFIRMASI TINDAKAN</p>
+      <h2 id="modal-title">Konfirmasi tindakan</h2>
+      <p id="modal-description">Tindakan ini akan mengubah status perangkat.</p>
+      <div id="modal-device" class="modal-device"></div>
+      <p id="modal-error" class="modal-error" role="alert"></p>
+      <div id="modal-actions" class="modal-actions">
+        <button id="modal-cancel" class="button button-secondary" type="button">Batal</button>
+        <button id="modal-confirm" class="button button-danger" type="button">Lanjutkan</button>
+      </div>
+      <div id="modal-processing" class="modal-processing" hidden>
+        <span class="spinner spinner-large" aria-hidden="true"></span>
+        <p id="processing-text">Memproses perubahan...</p>
+      </div>
+    </section>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="admin-script.js"></script>
+</body>
+</html>
