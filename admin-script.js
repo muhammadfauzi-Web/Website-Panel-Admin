@@ -13,7 +13,8 @@ const STATUS_CONFIG = {
   ACTIVE: { label: "Aktif", tone: "success" },
   DISABLED: { label: "Nonaktif", tone: "warning" },
   BLOCKED: { label: "Diblokir", tone: "danger" },
-  REMOVED: { label: "Dicabut", tone: "neutral" }
+  REMOVED: { label: "Dicabut", tone: "neutral" },
+  UNKNOWN: { label: "Tidak diketahui", tone: "neutral" }
 };
 
 const state = {
@@ -148,7 +149,10 @@ function normalizeDevice(id, data) {
   const status = String(data.status || "UNKNOWN").toUpperCase();
   return {
     id,
-    operatorName: data.operatorName || data.lastOperatorName || "—",
+    operatorName: data.lastOperatorName || data.operatorName || "—",
+    deviceName: data.deviceName || data.model || "Belum tersedia",
+    sessionId: data.sessionId || "Belum tersedia",
+    sessionStartedAt: data.sessionStartedAt || data.lastLoginAt || null,
     status: STATUS_CONFIG[status] ? status : "UNKNOWN",
     registeredAt: data.registeredAt || null,
     lastLoginAt: data.lastLoginAt || null,
@@ -173,7 +177,7 @@ function renderDevices() {
   const filter = els["status-filter"].value;
   const devices = state.devices
     .filter((device) => filter === "ALL" || device.status === filter)
-    .filter((device) => !query || `${device.id} ${device.operatorName}`.toLowerCase().includes(query))
+    .filter((device) => !query || `${device.id} ${device.operatorName} ${device.deviceName}`.toLowerCase().includes(query))
     .sort((a, b) => timestampValue(b.registeredAt) - timestampValue(a.registeredAt));
 
   if (!devices.length) {
@@ -189,17 +193,20 @@ function createDeviceCard(device) {
   const card = document.createElement("article");
   card.className = "device-card";
   const config = STATUS_CONFIG[device.status] || { label: device.status, tone: "neutral" };
-  const toggle = device.status === "DISABLED"
-    ? { status: "ACTIVE", label: "Aktifkan Kembali", className: "button-success" }
-    : { status: "DISABLED", label: "Nonaktifkan", className: "button-warning" };
+  const toggle = device.status === "ACTIVE"
+    ? { status: "DISABLED", label: "Nonaktifkan", className: "button-warning" }
+    : { status: "ACTIVE", label: "Aktifkan Kembali", className: "button-success" };
 
   card.innerHTML = `
-    <div>
-      <h3 class="device-id"></h3>
-      <p class="device-meta"></p>
+    <div class="device-details">
+      <div class="device-detail"><span class="detail-label">Device Id :</span><span class="detail-value device-id"></span></div>
+      <div class="device-detail"><span class="detail-label">Nama operator :</span><span class="detail-value device-operator"></span></div>
+      <div class="device-detail"><span class="detail-label">Nama perangkat :</span><span class="detail-value device-name"></span></div>
+      <div class="device-detail"><span class="detail-label">Sesi Login :</span><span class="detail-value device-session"></span></div>
+      <div class="device-detail"><span class="detail-label">Status :</span><span class="detail-value"><span class="status-badge status-${escapeHtml(device.status)} device-status"></span></span></div>
+      <p class="device-last-seen"></p>
     </div>
     <div class="device-side">
-      <span class="status-badge status-${escapeHtml(device.status)}">${escapeHtml(config.label)}</span>
       <div class="actions">
         <button class="button button-secondary" type="button" data-action="REMOVED">Hapus Perangkat</button>
         <button class="button button-danger" type="button" data-action="BLOCKED">Blokir Perangkat</button>
@@ -208,8 +215,14 @@ function createDeviceCard(device) {
     </div>`;
 
   card.querySelector(".device-id").textContent = device.id;
-  card.querySelector(".device-meta").textContent =
-    `Operator: ${device.operatorName}\nTerdaftar: ${formatTimestamp(device.registeredAt)}\nLogin terakhir: ${formatTimestamp(device.lastLoginAt)}`;
+  card.querySelector(".device-operator").textContent = device.operatorName;
+  card.querySelector(".device-name").textContent = device.deviceName;
+  card.querySelector(".device-session").textContent = device.sessionId === "Belum tersedia"
+    ? "Belum tersedia"
+    : `${device.sessionId} · ${formatTimestamp(device.sessionStartedAt)}`;
+  card.querySelector(".device-status").textContent = config.label;
+  card.querySelector(".device-last-seen").textContent =
+    `Terdaftar: ${formatTimestamp(device.registeredAt)} · Login terakhir: ${formatTimestamp(device.lastLoginAt)}`;
   card.querySelectorAll("button[data-action]").forEach((button) => {
     button.dataset.deviceId = device.id;
   });
@@ -234,7 +247,7 @@ function openConfirmation(device, nextStatus) {
 
   state.pendingAction = { deviceId: device.id, nextStatus, processingText: actionText[1] };
   els["modal-title"].textContent = `${actionText[0]}?`;
-  els["modal-description"].textContent = "Perubahan ini akan diterapkan ke Firestore dan memengaruhi akses perangkat pada pemeriksaan berikutnya.";
+  els["modal-description"].textContent = "Perubahan ini akan diterapkan ke Firestore. Jika perangkat sedang terhubung, status akses akan dipantau secara real-time oleh aplikasi.";
   els["modal-device"].innerHTML = `<strong></strong><br><span></span>`;
   els["modal-device"].querySelector("strong").textContent = device.id;
   els["modal-device"].querySelector("span").textContent = `Operator: ${device.operatorName} · Status saat ini: ${STATUS_CONFIG[device.status]?.label || device.status}`;

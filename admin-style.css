@@ -115,15 +115,21 @@ h2 { margin-bottom: 0; font-size: 1.25rem; }
 .filter-field select { background: white; }
 .device-list { display: grid; gap: 14px; margin-top: 14px; }
 .list-state { display: grid; justify-items: center; gap: 10px; padding: 42px 12px; color: var(--muted); text-align: center; }
-.device-card { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 18px; padding: 18px; border: 1px solid #e6eef8; border-radius: 20px; background: white; }
-.device-id { margin: 0 0 4px; overflow-wrap: anywhere; font-size: 1.05rem; }
-.device-meta { margin: 0; color: var(--muted); line-height: 1.7; }
+.device-card { display: grid; grid-template-columns: minmax(0, 1fr) minmax(190px, auto); gap: 18px; padding: 18px; border: 1px solid #e6eef8; border-radius: 20px; background: white; }
+.device-details { min-width: 0; display: grid; gap: 10px; }
+.device-detail { display: grid; grid-template-columns: minmax(125px, 155px) minmax(0, 1fr); gap: 10px; align-items: start; line-height: 1.5; }
+.detail-label { color: var(--muted); font-size: .88rem; font-weight: 750; }
+.detail-value { min-width: 0; color: var(--ink); font-size: .9rem; font-weight: 650; overflow-wrap: anywhere; }
+.device-detail .device-id { margin: 0; font-size: .9rem; font-weight: 750; }
+.device-session { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .78rem; font-weight: 600; }
+.device-last-seen { margin: 3px 0 0; color: var(--muted); font-size: .78rem; line-height: 1.5; }
 .device-side { display: grid; justify-items: end; align-content: start; gap: 12px; }
 .status-badge { display: inline-flex; align-items: center; min-height: 30px; border-radius: 999px; padding: 0 11px; font-size: 0.78rem; font-weight: 800; }
 .status-ACTIVE { color: var(--active); background: var(--active-bg); }
 .status-DISABLED { color: var(--disabled); background: var(--disabled-bg); }
 .status-BLOCKED { color: var(--blocked); background: var(--blocked-bg); }
 .status-REMOVED { color: var(--removed); background: var(--removed-bg); }
+.status-UNKNOWN { color: var(--removed); background: var(--removed-bg); }
 .actions { display: flex; flex-wrap: wrap; justify-content: end; gap: 8px; }
 .actions .button { min-height: 40px; font-size: 0.84rem; }
 
@@ -147,11 +153,13 @@ h2 { margin-bottom: 0; font-size: 1.25rem; }
   .summary-grid, .filters, .device-card { grid-template-columns: 1fr; }
   .hero, .section-heading, .topbar-inner, .admin-account { align-items: stretch; flex-direction: column; }
   .topbar-inner { padding: 16px 0; }
+  .device-detail { grid-template-columns: 125px minmax(0, 1fr); }
   .device-side, .actions, .modal-actions { justify-items: stretch; justify-content: stretch; }
   .actions .button, .modal-actions .button { width: 100%; }
 }
 @media (max-width: 560px) {
   .summary-grid { grid-template-columns: 1fr 1fr; }
   .auth-panel, .device-section, .modal { padding: 20px; }
+  .device-detail { grid-template-columns: 1fr; gap: 2px; }
   .dashboard-content, .topbar-inner { width: min(100% - 20px, 1180px); }
 }
