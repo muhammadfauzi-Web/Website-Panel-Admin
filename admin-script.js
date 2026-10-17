@@ -1,3 +1,16 @@
+// PWA Service Worker Registration
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(registration => {
+        console.log('ServiceWorker terdaftar dengan sukses. Scope:', registration.scope);
+      })
+      .catch(error => {
+        console.log('Pendaftaran ServiceWorker gagal:', error);
+      });
+  });
+}
+
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyCm5LHJFZzWmch85lBMBmkJ-PhKh_h4Ymw",
   authDomain: "akses-struk-spbu.firebaseapp.com",
@@ -103,7 +116,8 @@ async function loginAdmin() {
     const { auth } = getFirebaseServices();
     await auth.signInWithEmailAndPassword(email, password);
     els["admin-password"].value = "";
-    showLogin("");
+    els["login-message"].textContent = ""; // Perbaikan: Langsung menghapus teks tanpa mengubah view agar transisi dashboard terlihat mulus
+    els["login-message"].classList.remove("is-info", "is-error");
   } catch (error) {
     showLogin(mapAuthError(error), "error");
   } finally {
@@ -276,12 +290,14 @@ async function confirmAction() {
       statusUpdatedBy: auth.currentUser ? auth.currentUser.email : OWNER_EMAIL,
       statusReason: `Diubah melalui Admin App menjadi ${nextStatus}`
     });
+    
+    // Perbaikan: Sistem mengizinkan close modal jika state.processing disetel kembali ke false
+    state.processing = false; 
     closeModal();
     showDashboardMessage("Status perangkat berhasil diperbarui.", "success");
   } catch (error) {
     els["modal-error"].textContent = mapFirestoreError(error);
     setModalProcessing(false);
-  } finally {
     state.processing = false;
   }
 }
